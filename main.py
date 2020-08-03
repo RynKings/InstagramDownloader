@@ -18,21 +18,17 @@ def get_media_download_url(self, media_id, media=False):
         if not self.last_json.get("items"):
             return True
         media = self.last_json["items"][0]
-    if media["media_type"] == 2:
-        try:
-            clips = media["video_versions"]
-            url_results.append({'url': clips[0]["url"], 'video': True})
-        except KeyError:
-            carousels = media.get("carousel_media", [])
-            for carousel in carousels:
-                url_results.append({'url':carousel["video_versions"][0]["url"], 'video': True})
-    elif media["media_type"] == 1:
+    if media["media_type"] == 1:
         images = media["image_versions2"]["candidates"]
-        url_results.append({'url': images[0]["url"], 'video': False})
+        url_results.append({'url': images[0]["url"], 'video': False})            
+    elif media["media_type"] == 2:
+        clips = media["video_versions"]
+        url_results.append({'url': clips[0]["url"], 'video': True})
     else:
         for index in range(len(media["carousel_media"])):
             if media["carousel_media"][index]["media_type"] != 1:
-                continue
+                videos = media["carousel_media"][index]["video_versions"][0]["url"]
+                url_results.append({'url': videos, 'video': True})
             images = media["carousel_media"][index]["image_versions2"]["candidates"]
             url_results.append({'url': images[0]["url"], 'video': False})
     return url_results
